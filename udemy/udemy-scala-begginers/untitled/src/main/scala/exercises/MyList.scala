@@ -1,6 +1,6 @@
 package exercises
 
-abstract class MyList {
+abstract class MyList[+A] {
 
   /*
   * head = first element of the list
@@ -10,38 +10,37 @@ abstract class MyList {
   * toString => a string representation of the list
   * */
 
-  def head: Int
-  def tail: MyList
+  def head: A
+  def tail: MyList[A]
   def isEmpty: Boolean
-  def add(n: Int): MyList
+  def add[B >: A](n: B): MyList[B]
   def printElements: String
   override def toString: String = "[" + printElements + "]"
 }
 
-object Empty extends MyList {
-  override def head: Int = -1
-  override def tail: MyList = null
+object Empty extends MyList[Nothing] {
+  override def head: Nothing = throw new NoSuchElementException
+  override def tail: MyList[Nothing] = throw new NoSuchElementException
   override def isEmpty: Boolean = true
-  override def add(n: Int): MyList = new Cons(n, Empty)
+  override def add[B >: Nothing] (n: B): MyList[B] = new Cons(n, Empty)
   override def printElements: String = ""
 }
 
-class Cons(h: Int, t: MyList) extends MyList {
-  override def head: Int = h
-  override def tail: MyList = t
+class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
+  override def head: A = h
+  override def tail: MyList[A] = t
   override def isEmpty: Boolean = false
-  override def add(n: Int): MyList = new Cons(n, this)
+  override def add[B >: A](n: B): MyList[B] = new Cons(n, this)
   override def printElements: String = {
     if (t.isEmpty) "" + h
-    else h + " -> " + t.printElements
+    else s"$h -> ${t.printElements}"
   }
 
 }
 
 object ListTest extends App {
-  val lista = new Cons(1, new Cons(2, new Cons(3, Empty)))
-  println(lista.tail.tail.head)
-  val lista2 = lista.add(0)
-  println(lista2.head)
-  println(lista2.toString)
+  val listOfIntegers = new Cons(1, new Cons(2, new Cons(3, Empty)))
+  println(listOfIntegers.toString)
+  val listOfStrings = new Cons("Hello", new Cons("Scala", new Cons("test", Empty)))
+  println(listOfStrings.toString)
 }
